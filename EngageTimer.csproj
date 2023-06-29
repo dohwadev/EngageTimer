@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net6.0-windows</TargetFramework>
+        <TargetFramework>net7.0-windows</TargetFramework>
         <PlatformTarget>x64</PlatformTarget>
         <Platforms>AnyCPU</Platforms>
         <LangVersion>10</LangVersion>
@@ -74,7 +74,7 @@
     </ItemGroup>
 
     <PropertyGroup>
-        <DalamudLibPath>E:\GitHubDesktop\Dalamud 7.3.5.0\bin\Release\</DalamudLibPath>
+        <DalamudLibPath>E:\GitHubDesktop\dohwacorp\Dalamud\bin\Release\</DalamudLibPath>
     </PropertyGroup>
 
     <ItemGroup>
