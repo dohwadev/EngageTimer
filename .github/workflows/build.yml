@@ -1,0 +1,46 @@
+name: .NET Build
+
+on:
+  push:
+    branches: '*'
+    tags-ignore: '*'
+  pull_request:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+      - name: Setup dev names
+        run: |
+          ((Get-Content -path .\EngageTimer.csproj -Raw) -replace '<AssemblyName>EngageTimer','<AssemblyName>EngageTimerDev') | Set-Content -Path .\EngageTimer.csproj
+          ((Get-Content -path .\EngageTimer.csproj -Raw) -replace '<Name>EngageTimer - Dev Version','<Name>EngageTimerDev') | Set-Content -Path .\EngageTimer.csproj
+          ((Get-Content -path .\EngageTimer.yaml -Raw) -replace 'name: EngageTimer','name: EngageTimer - Dev Version') | Set-Content -Path .\EngageTimer.yaml
+          Move-Item .\EngageTimer.yaml .\EngageTimerDev.yaml
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v1.0.2
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 7.0.*
+      - name: Restore dependencies
+        run: dotnet restore
+      - name: Download Dalamud
+        run: |
+          Invoke-WebRequest -Uri https://goatcorp.github.io/dalamud-distrib/latest.zip -OutFile latest.zip
+          Expand-Archive -Force latest.zip "$env:AppData\XIVLauncher\addon\Hooks\dev"
+      - name: Build
+        run: |
+          dotnet build --no-restore --configuration Release --nologo
+      - name: Upload Build Artifact
+        uses: actions/upload-artifact@v2.2.1
+        with:
+          name: build.zip
+          path: |
+            bin/Release/EngageTimerDev/latest.zip
+            bin/Release/EngageTimerDev/EngageTimerDev.json
+      - name: Update testing repository
+        run: |
+          Invoke-WebRequest -Uri https://plogon.xorus.dev/update
